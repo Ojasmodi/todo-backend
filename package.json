@@ -9,6 +9,7 @@
   "author": "Ojas Modi",
   "license": "ISC",
   "dependencies": {
+    "apidoc": "^0.17.7",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.4",

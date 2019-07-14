@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
-const HistoryController = require('./historyController');
 const shortid = require('shortid');
 const time = require('../libs/timeLib');
 const response = require('../libs/responseLib')
 const logger = require('../libs/loggerLib');
 const check = require('../libs/checkLib')
 
-
-
-/* Models */
 const ItemModel = mongoose.model('Item')
 const HistoryModel = mongoose.model('History')
 const ListModel = mongoose.model('List')
@@ -35,37 +31,8 @@ let getAllItems = (req, res) => {
             }
         })
 
-}// end getAllItemsFunction 
+}// end getAllItems Function 
 
-
-/*  Start getItemDetailsFunction */
-/* params : ItemId
-*/
-let getItemDetails = (req, res) => {
-    ItemModel.findOne({ 'itemId': req.params.itemId })
-        .select()
-        .lean()
-        .exec((err, ItemDetails) => {
-            if (err) {
-                console.log(err)
-                logger.error(err.message, 'Item Controller: getItemDetails', 10)
-                let apiResponse = response.generate(true, 'Failed To Find Items', 500, null)
-                res.send(apiResponse)
-            } else if (check.isEmpty(ItemDetails)) {
-                logger.info('No Item Found', 'Item  Controller:getItemDetailsFunction')
-                let apiResponse = response.generate(true, 'No Item Found', 404, null)
-                res.send(apiResponse)
-            } else {
-                let apiResponse = response.generate(false, 'Item Found', 200, ItemDetails)
-                res.send(apiResponse)
-            }
-        })
-}// end getItemDetailsFunction
-
-
-/* Start Delete Item  */
-/* params : ItemId
-*/
 let deleteItem = (data, cb) => {
 
     let findListDetails = (data) => {
@@ -161,13 +128,8 @@ let deleteItem = (data, cb) => {
             cb(err, null)
         })
 
-}// end deleteItemFunction 
+}// end delete Item Function 
 
-
-/* Start Update Item details */
-/* params: ItemId
-   body : ItemName,ItemMode,ItemModifierId,ItemModifierName
-*/
 
 let updateItem = (data, cb) => {
 
@@ -251,13 +213,7 @@ let updateItem = (data, cb) => {
             cb(err, null)
         })
 
-}// end updateItemFunction 
-
-
-// start addItemFunction 
-/* params: listId,ItemName,ItemCreatorId,ItemCreatorName,ItemModifierId,ItemModifierName
-           
-*/
+}// end update Item Function 
 
 
 let addItem = (data, cb) => {
@@ -296,9 +252,8 @@ let addItem = (data, cb) => {
         })
     }// end findListDetails
 
-    let addItem = () => {
+    let addItems = () => {
         return new Promise((resolve, reject) => {
-            //console.log(req.body)
             let newItem = new ItemModel({
 
                 listId: data.listId,
@@ -309,7 +264,6 @@ let addItem = (data, cb) => {
                 itemBelongsTo: data.itemBelongsTo
             })
 
-            //console.log(newItem)
             newItem.save((err, newItem) => {
                 if (err) {
                     console.log(err)
@@ -328,7 +282,7 @@ let addItem = (data, cb) => {
 
     validatelistInput(data)
         .then(findListDetails)
-        .then(addItem)
+        .then(addItems)
         .then((resolve) => {
             let apiResponse = response.generate(false, 'Item Created', 200, resolve)
             cb(null, apiResponse)
@@ -338,12 +292,8 @@ let addItem = (data, cb) => {
             cb(err, null)
         })
 
-}// end addItemFunction 
+}// end add Item Function 
 
-
-/* Start getSubItemDetailsFunction */
-/* params: itemId */
-/* body params: subItemId */
 
 
 let getSubItemDetails = (data, cb) => {
@@ -364,7 +314,6 @@ let getSubItemDetails = (data, cb) => {
                         let apiResponse = response.generate(true, 'No Item Found', 404, null)
                         reject(apiResponse)
                     } else {
-                        let apiResponse = response.generate(false, 'Item Details Found', 200, ItemDetails)
                         resolve(ItemDetails)
                     }
                 })
@@ -400,7 +349,6 @@ let getSubItemDetails = (data, cb) => {
     findItemDetails(req, res)
         .then(findSubItemDetails)
         .then((resolve) => {
-            //let apiResponse = response.generate(false, 'Item Updated', 200, "None")
             cb(null, resolve)
         })
         .catch((err) => {
@@ -408,13 +356,8 @@ let getSubItemDetails = (data, cb) => {
             cb(err, null)
         })
 
-}// end getSubItemDetailsFunction 
+}// end getSubItemDetails Function 
 
-
-/* Start addSubItemFunction */
-/* params: ItemId
-   body : subItemName,subItemModifierId,subItemModifierName,subItemCreatorId,subItemCreatorName
-*/
 
 let addSubItem = (data, cb) => {
 
@@ -451,12 +394,9 @@ let addSubItem = (data, cb) => {
                 subItemDone:'open',
                 subItemBelongsTo:data.subItemBelongsTo,
                 parentItemId:data.itemId,
-                // subItemModifierId: data.subItemModifierId,
-                // subItemModifierName: req.body.subItemModifierName,
                 subItemCreatedOn: time.now(),
                 subItemModifiedOn: time.now(),
             }
-            //To add the subitem in item model we will use push method of array
 
             let options = {
                 $push: {
@@ -465,13 +405,7 @@ let addSubItem = (data, cb) => {
                     }
                 }
             }
-
-
             options.itemModifiedOn = time.now()
-            // options.itemModifierId = req.body.subItemModifierId,
-            //     options.itemModifierName = req.body.subItemModifierName,
-
-
             ItemModel.update({ 'itemId': data.itemId }, options).exec((err, result) => {
                 if (err) {
                     console.log(err)
@@ -503,15 +437,8 @@ let addSubItem = (data, cb) => {
             cb(err, null)
         })
 
-}// end addSubItemFunction 
+}// end addSubItem Function 
 
-
-/* Start deleteSubItemFunction */
-/* params: ItemId,subItemId,
-   Body:    itemModifierId                 
-            itemModifierName
-
-*/
 
 let deleteSubItem = (data, cb) => {
 
@@ -616,7 +543,7 @@ let deleteSubItem = (data, cb) => {
             cb(err, null)
         })
 
-}// end deleteSubItemFunction 
+}// end deleteSubItem Function 
 
 
 let updateSubItem = (data, cb) => {
@@ -668,7 +595,6 @@ let updateSubItem = (data, cb) => {
     let updateItem = () => {
         return new Promise((resolve, reject) => {
 
-            //To update the subitem in item model we will use set method of array
             let options = {
                 $set: {
                     "subItems.$.subItemName": data.subItemName,
@@ -678,12 +604,8 @@ let updateSubItem = (data, cb) => {
                     "subItems.$.subItemModifiedOn": time.now(),
                 }
             }
-
-
             options.itemModifiedOn = time.now()
-            // options.itemModifierId = req.body.subItemModifierId,
-            // options.itemModifierName = req.body.subItemModifierName
-
+           
             ItemModel.update({ 'itemId': data.itemId, 'subItems.subItemId': data.subItemId }, options).exec((err, result) => {
                 if (err) {
                     console.log(err)
@@ -715,20 +637,16 @@ let updateSubItem = (data, cb) => {
             cb(err, null)
         })
 
-}// end updateSubItemFunction 
-
-
+}// end updateSubItem Function 
 
 module.exports = {
     addItem: addItem,
     updateItem: updateItem,
     deleteItem: deleteItem,
     getAllItems: getAllItems,
-    getItemDetails: getItemDetails,
     addSubItem: addSubItem,
     deleteSubItem: deleteSubItem,
     updateSubItem: updateSubItem,
     getSubItemDetails: getSubItemDetails
-
-}// end exports
+}
 

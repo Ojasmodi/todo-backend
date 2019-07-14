@@ -21,16 +21,6 @@ let HistorySchema = new Schema({
   },
 
   history: {},
-
-  /* itemId: {
-    type: String,
-    default: '',
-  },
-
-  subItemId: {
-    type: String,
-    default: '',
-  }, */
   
   createdOn: {
     type: Date,
