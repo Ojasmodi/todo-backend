@@ -6,7 +6,7 @@ const logger = require('../libs/loggerLib');
 const check = require('../libs/checkLib')
 const ItemModel = mongoose.model('Item')
 const ListModel = mongoose.model('List')
-const UserModel = mongoose.model('User')
+const HistoryController = require('./historyController')
 
 let getAllLists = (req, res) => {
 
@@ -100,8 +100,17 @@ let deleteList = (data, cb) => {
     findListDetails(data).
         then(deleteList)
         .then((resolve) => {
-            //let apiResponse = response.generate(false, 'Deleted the List successfully', 200, resolve)
-            cb(null, resolve)
+            HistoryController.addHistory(data, (err, result) => {
+                if (err) {
+                    //err.listCreatorId= data.listCreatorId;
+                    cb(data,null)
+                }
+                else {
+                    //result.data.listId=data.listId
+                    //console.log('history added',result)
+                    cb(null, resolve)
+                }
+            });            
         })
         .catch((err) => {
             console.log(err);
@@ -193,6 +202,7 @@ let addList = (data,cb) => {
                 listName: data.listName,
                 listCreatorId: data.listCreatorId,
                 listCreatorName: data.listCreatorName,
+                listBelongsTo:data.listBelongsTo
                 //listModifierId: data.listModifierId,
                 //listModifierName: data.listModifierName,
             })

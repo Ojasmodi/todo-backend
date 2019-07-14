@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
+const HistoryController = require('./historyController');
 const shortid = require('shortid');
 const time = require('../libs/timeLib');
 const response = require('../libs/responseLib')
 const logger = require('../libs/loggerLib');
 const check = require('../libs/checkLib')
 
+
+
 /* Models */
 const ItemModel = mongoose.model('Item')
+const HistoryModel = mongoose.model('History')
 const ListModel = mongoose.model('List')
 
-
-/* Start getAllItemsFunction */
-/* params: listId
-*/
 
 let getAllItems = (req, res) => {
 
@@ -68,7 +68,7 @@ let getItemDetails = (req, res) => {
 */
 let deleteItem = (data, cb) => {
 
-    let findListDetails = () => {
+    let findListDetails = (data) => {
         return new Promise((resolve, reject) => {
             ListModel.findOne({ 'listId': data.listId })
                 .select()
@@ -134,12 +134,27 @@ let deleteItem = (data, cb) => {
         })
     }// end deleteItem function
 
-    findListDetails()
+    findListDetails(data)
         .then(findItemDetails)
         .then(deleteItem)
         .then((resolve) => {
-            //let apiResponse = response.generate(false, 'Deleted the Item successfully', 200, resolve)
-            cb(null, resolve)
+            let newHistory = new HistoryModel({
+                historyId: shortid.generate(),
+                createdOn: time.now(),
+                type :'item',
+                history : data.item,
+                historyCreatorId :data.item.itemBelongsTo
+            })
+   
+            newHistory.save((err, newItem) => {
+                if (err) {
+                    logger.error(err.message, 'HistoryController: addHistory', 10)
+                    let apiResponse = response.generate(true, 'Item deleted but history is not saved', 500, null)
+                    cb(apiResponse, null)
+                } else {
+                    cb(null, resolve)
+                }
+            })
         })
         .catch((err) => {
             console.log(err);
@@ -291,10 +306,7 @@ let addItem = (data, cb) => {
                 itemId: shortid.generate(),
                 itemCreatorId: data.itemCreatorId,
                 itemCreatorName: data.itemCreatorName,
-                // itemModifierId: req.body.itemModifierId,
-                // itemModifierName: req.body.itemModifierName,
-                // itemCreatedOn: time.now(),
-                // itemModifiedOn: time.now(),
+                itemBelongsTo: data.itemBelongsTo
             })
 
             //console.log(newItem)
@@ -437,6 +449,8 @@ let addSubItem = (data, cb) => {
                 subItemCreatorId: data.subItemCreatorId,
                 subItemCreatorName: data.subItemCreatorName,
                 subItemDone:'open',
+                subItemBelongsTo:data.subItemBelongsTo,
+                parentItemId:data.itemId,
                 // subItemModifierId: data.subItemModifierId,
                 // subItemModifierName: req.body.subItemModifierName,
                 subItemCreatedOn: time.now(),
@@ -547,9 +561,6 @@ let deleteSubItem = (data, cb) => {
 
     let updateItem = () => {
         return new Promise((resolve, reject) => {
-
-            //To delete the subitem from item model we will use pull method of array
-
             let options = {
                 $pull: {
                     subItems: {
@@ -559,9 +570,6 @@ let deleteSubItem = (data, cb) => {
             }
 
             options.itemModifiedOn = time.now()
-            // options.itemModifierId = req.body.subItemModifierId,
-            //     options.itemModifierName = req.body.subItemModifierName,
-
 
             ItemModel.update({ 'itemId': data.itemId }, options).exec((err, result) => {
                 if (err) {
@@ -586,8 +594,22 @@ let deleteSubItem = (data, cb) => {
         .then(findItemDetails)
         .then(updateItem)
         .then((resolve) => {
-            //let apiResponse = response.generate(false, 'Item Updated', 200, "None")
-            cb(null, resolve)
+            let newHistory = new HistoryModel({
+                historyId: shortid.generate(),
+                createdOn: time.now(),
+                type :'subItem',
+                history :data.subItem,
+                historyCreatorId : data.subItem.subItemBelongsTo
+            })
+            newHistory.save((err, newItem) => {
+                if (err) {
+                    logger.error(err.message, 'HistoryController: addHistory', 10)
+                    let apiResponse = response.generate(true, 'SubItem deleted but history is not saved', 500, null)
+                    cb(apiResponse, null)
+                } else {
+                    cb(null, resolve)
+                }
+            }) 
         })
         .catch((err) => {
             console.log(err);
@@ -596,11 +618,6 @@ let deleteSubItem = (data, cb) => {
 
 }// end deleteSubItemFunction 
 
-
-/* Start Update Sub Item */
-/* params: ItemId,subItemId
-   body : subItemName,subItemMode,subItemModifierId,subItemModifierName,subItemDone
-*/
 
 let updateSubItem = (data, cb) => {
 
@@ -714,3 +731,4 @@ module.exports = {
     getSubItemDetails: getSubItemDetails
 
 }// end exports
+

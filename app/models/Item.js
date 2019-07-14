@@ -48,6 +48,11 @@ let ItemSchema = new Schema({
     default: ''
   },
 
+  itemBelongsTo: {
+    type: String,
+    default: ''
+  },
+
   itemDone:{
     type:String,
     default:'open'
@@ -62,6 +67,16 @@ let ItemSchema = new Schema({
       },
     
       subItemName: {
+        type: String,
+        default: ''
+      },
+
+      parentItemId: {
+        type: String,
+        default: ''
+      },
+
+      subItemBelongsTo: {
         type: String,
         default: ''
       },

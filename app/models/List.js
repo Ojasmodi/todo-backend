@@ -33,6 +33,11 @@ let ListSchema = new Schema({
     default: ''
   },
 
+  listBelongsTo: {
+    type: String,
+    default: ''
+  },
+
   listCreatedOn :{
     type:Date,
     default:Date.now()

@@ -3,6 +3,7 @@ const friendController = require('./../controllers/friendController')
 const tokenLib = require("./tokenLib.js");
 const listController = require("./../controllers/listController")
 const itemController = require("./../controllers/itemController")
+const historyController = require("./../controllers/historyController")
 
 let setServer = (server) => {
 
@@ -184,6 +185,34 @@ let setServer = (server) => {
                     result.deletedBy=data.deletedBy
                     console.log(result)
                     myIO.in(socket.room).emit('deleted-subitem', result);
+                }
+            });
+        })
+
+        socket.on('undo', (data) => {
+            //console.log(data)
+            historyController.getHistory(data, (err, result) => {
+                if (err) {
+                    err.data={}
+                    err.data.changeDoneById=data.userId;
+                    err.data.changeDoneByName=data.userName;
+                    //console.log(err)
+                    myIO.in(socket.room).emit('undo-error', err);
+                }
+                else {
+                    result.data.undo=true;
+                    result.data.changeDoneById=data.userId;
+                    result.data.changeDoneByName=data.userName;
+                    //console.log(result)
+                    if(result.message=='list'){
+                        myIO.in(socket.room).emit('new-created-list', result);
+                    }
+                    else if(result.message=='item'){
+                        myIO.in(socket.room).emit('new-created-item', result); 
+                    }
+                    else{
+                        myIO.in(socket.room).emit('new-created-subitem', result);
+                    }
                 }
             });
         })

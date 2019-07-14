@@ -1,9 +1,3 @@
-'use strict'
-
-/**
- * Module Dependencies
-*/
-
 const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
  
@@ -16,12 +10,19 @@ let HistorySchema = new Schema({
     unique: true
   },
   
-  listId: {
+  type: {
     type: String,
     default: '',
   },
 
-  itemId: {
+  historyCreatorId:{
+    type: String,
+    default: '',
+  },
+
+  history: {},
+
+  /* itemId: {
     type: String,
     default: '',
   },
@@ -29,14 +30,7 @@ let HistorySchema = new Schema({
   subItemId: {
     type: String,
     default: '',
-  },
-
-  key: {
-    type: String,
-    default: '',
-  },
-  
-  itemValues:[],
+  }, */
   
   createdOn: {
     type: Date,
