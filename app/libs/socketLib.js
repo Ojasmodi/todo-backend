@@ -55,8 +55,8 @@ let setServer = (server) => {
 
         }) // end of on disconnect
 
-        socket.on('create-list', (data) => {
-            //console.log(data)
+        // event to creating list
+        socket.on('create-list', (data) => {          
             listController.addList(data, (err, result) => {
                 if (err) {
                     err.listCreatorId= data.listCreatorId;
@@ -68,8 +68,9 @@ let setServer = (server) => {
             });
         }) 
         
+        // event to creating item
         socket.on('create-item', (data) => {
-            //console.log(data)
+            
             itemController.addItem(data, (err, result) => {
                 if (err) {
                     err.listCreatorId= data.listCreatorId;
@@ -77,14 +78,15 @@ let setServer = (server) => {
                 }
                 else {
                     result.data.listId=data.listId
-                    console.log(result)
+                    //console.log(result)
                     myIO.in(socket.room).emit('new-created-item', result);
                 }
             });
         })
         
+        // event for creating subitem
         socket.on('create-subitem', (data) => {
-            //console.log(data)
+            
             itemController.addSubItem(data, (err, result) => {
                 if (err) {
                     err.subItemCreatorId = data.subItemCreatorId;
@@ -98,8 +100,9 @@ let setServer = (server) => {
             });
         })
 
+        // event for updating list
         socket.on('update-list', (data) => {
-            //console.log(data)
+            
             listController.updateList(data, (err, result) => {
                 if (err) {
                     err.listCreatorId= data.listCreatorId;
@@ -113,8 +116,9 @@ let setServer = (server) => {
             });
         })
 
+        // event to delete list
         socket.on('delete-list', (data) => {
-            //console.log(data)
+            
             listController.deleteList(data, (err, result) => {
                 if (err) {
                     err.deletedBy= data.deletedBy;
@@ -128,8 +132,9 @@ let setServer = (server) => {
             });
         })
 
+        // event for updating item
         socket.on('update-item', (data) => {
-            //console.log(data)
+            
             itemController.updateItem(data, (err, result) => {
                 if (err) {
                     err.listCreatorId= data.listCreatorId;
@@ -143,6 +148,7 @@ let setServer = (server) => {
             });
         })
 
+        // event for updating subitem
         socket.on('update-subitem', (data) => {
             console.log(data)
             itemController.updateSubItem(data, (err, result) => {
@@ -158,8 +164,9 @@ let setServer = (server) => {
             });
         })
 
+        // event for deleting item
         socket.on('delete-item', (data) => {
-            //console.log(data)
+            
             itemController.deleteItem(data, (err, result) => {
                 if (err) {
                     err.deletedBy= data.deletedBy;
@@ -173,8 +180,9 @@ let setServer = (server) => {
             });
         })
 
+        // event for deleting subitem
         socket.on('delete-subitem', (data) => {
-            //console.log(data)
+            
             itemController.deleteSubItem(data, (err, result) => {
                 if (err) {
                     err.deletedBy= data.deletedBy;
@@ -188,9 +196,10 @@ let setServer = (server) => {
                 }
             });
         })
-
+        
+        // event for undo action
         socket.on('undo', (data) => {
-            //console.log(data)
+            
             historyController.getHistory(data, (err, result) => {
                 if (err) {
                     err.data={}
@@ -230,7 +239,7 @@ let setServer = (server) => {
                     myIO.in(socket.room).emit('new-friend-request', result);
                 }
             });
-        }) // end of on delete-assignee
+        }) // end of send-request
 
         socket.on('accept-request', (info) => {
             console.log(info)
@@ -245,7 +254,7 @@ let setServer = (server) => {
                     myIO.in(socket.room).emit('new-friend', result);
                 }
             });
-        }) // end of on delete-assignee
+        }) // end of accept-request
 
     });
 }

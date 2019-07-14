@@ -4,7 +4,6 @@ const time = require('../libs/timeLib');
 const response = require('../libs/responseLib')
 const logger = require('../libs/loggerLib');
 const check = require('../libs/checkLib')
-const ItemModel = mongoose.model('Item')
 const ListModel = mongoose.model('List')
 const HistoryController = require('./historyController')
 
@@ -28,7 +27,7 @@ let getAllLists = (req, res) => {
                 res.send(apiResponse)
             }
         })
-}// end getAllListsFunction 
+}// end getAllLists Function 
 
 let getListById = (req, res) => {
     ListModel.findOne({ 'listId': req.params.listId })
@@ -49,7 +48,7 @@ let getListById = (req, res) => {
                 res.send(apiResponse)
             }
         })
-}// end getListDetailsFunction
+}// end getListDetails Function
 
 let deleteList = (data, cb) => {
 
@@ -102,12 +101,9 @@ let deleteList = (data, cb) => {
         .then((resolve) => {
             HistoryController.addHistory(data, (err, result) => {
                 if (err) {
-                    //err.listCreatorId= data.listCreatorId;
                     cb(data,null)
                 }
                 else {
-                    //result.data.listId=data.listId
-                    //console.log('history added',result)
                     cb(null, resolve)
                 }
             });            
@@ -117,7 +113,7 @@ let deleteList = (data, cb) => {
             cb(err, null)
         })
 
-}// end deleteListFunction 
+}// end deleteList Function 
 
 
 let updateList = (data, cb) => {
@@ -177,7 +173,7 @@ let updateList = (data, cb) => {
             cb(err,null)
         })
 
-}// end updateListFunction 
+}// end updateList Function 
 
 
 let addList = (data,cb) => {
@@ -196,15 +192,12 @@ let addList = (data,cb) => {
 
     let addList = (data) => {
         return new Promise((resolve, reject) => {
-            //console.log(req.body)
             let newList = new ListModel({
                 listId: shortid.generate(),
                 listName: data.listName,
                 listCreatorId: data.listCreatorId,
                 listCreatorName: data.listCreatorName,
                 listBelongsTo:data.listBelongsTo
-                //listModifierId: data.listModifierId,
-                //listModifierName: data.listModifierName,
             })
             newList.save((err, newList) => {
                 if (err) {
@@ -234,8 +227,6 @@ let addList = (data,cb) => {
         })
 
 }// end addListFunction 
-
-
 
 module.exports = {
     addList: addList,

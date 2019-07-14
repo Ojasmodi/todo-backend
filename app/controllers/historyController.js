@@ -28,16 +28,14 @@ let addHistory = (data, cb) => {
         if (err) {
             console.log(err)
             logger.error(err.message, 'HistoryController: addHistory', 10)
-            //let apiResponse = response.generate(true, 'Failed to add history Item', 500, null)
             cb(err, null)
         } else {
             let newItemObj = newItem.toObject();
-            //console.log(newItemObj)
             cb(null, newItemObj)
         }
     })
 
-}// end addHistoryFunction 
+}// end addHistory Function 
 
 let getHistory = (data, cb) => {
 
@@ -93,7 +91,7 @@ let getHistory = (data, cb) => {
             }
         })
 
-}// end deleteHistoryFunction 
+}// end getHistory Function 
 
 module.exports = {
     addHistory: addHistory,

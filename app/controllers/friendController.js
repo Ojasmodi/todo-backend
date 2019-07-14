@@ -52,7 +52,7 @@ let sendFriendRequest = (data, cb) => {
             let apiResponse = response.generate(false, 'Request saved successfully', 200, err);
             cb(err, apiResponse)
         });
-}
+} // end of sendFriendRequest Function
 
 let acceptRequest = (data, cb) => {
 
@@ -71,7 +71,7 @@ let acceptRequest = (data, cb) => {
             cb(null, apiResponse)
         }
     });
-}
+} // end of acceptRequest Function
 
 let getAllFriendList = (req, res) => {
     FriendListModel.find()
@@ -92,7 +92,7 @@ let getAllFriendList = (req, res) => {
                 res.send(apiResponse)
             }
         })
-}
+}// end of getAllFriendList Function
 
 module.exports = {
     sendFriendRequest: sendFriendRequest,
